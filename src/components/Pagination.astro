@@ -1,0 +1,44 @@
+---
+interface Props {
+  /**
+   * Values come straight from Astro's paginate() `page.url` object, which already
+   * carries the configured base — passing them through withBase() would double it.
+   */
+  prevUrl?: string;
+  nextUrl?: string;
+  current: number;
+  total: number;
+}
+
+const { prevUrl, nextUrl, current, total } = Astro.props;
+---
+
+{
+  total > 1 && (
+    <nav class="pagination" aria-label="Pagination">
+      {prevUrl ? (
+        <a rel="prev" href={prevUrl}>
+          &larr; Newer posts
+        </a>
+      ) : (
+        <span class="spacer" aria-hidden="true">
+          &larr; Newer posts
+        </span>
+      )}
+
+      <span aria-current="page">
+        Page {current} of {total}
+      </span>
+
+      {nextUrl ? (
+        <a rel="next" href={nextUrl}>
+          Older posts &rarr;
+        </a>
+      ) : (
+        <span class="spacer" aria-hidden="true">
+          Older posts &rarr;
+        </span>
+      )}
+    </nav>
+  )
+}

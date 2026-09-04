@@ -1,0 +1,29 @@
+---
+import type { MarkdownHeading } from 'astro';
+import { TOC_MIN_HEADINGS } from '../consts';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+// h2/h3 only — deeper levels make the list noisier than the article.
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+const show = items.length >= TOC_MIN_HEADINGS;
+---
+
+{
+  show && (
+    <details class="toc" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+        <ol>
+          {items.map((heading) => (
+            <li class={`depth-${heading.depth}`}>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  )
+}

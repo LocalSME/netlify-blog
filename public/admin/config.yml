@@ -1,0 +1,121 @@
+# Sveltia CMS configuration.
+#
+# Auth: GitHub backend with fine-grained Personal Access Token login.
+#
+# Use the "Sign In Using Access Token" button. The "Sign In with GitHub" button starts
+# an OAuth flow that requires a server to hold a client secret; there is no `base_url`
+# here and no OAuth backend, so it falls back to Netlify's provider (which this site is
+# not registered with) and hangs on "Signing in...". Sveltia offers no option to hide
+# it. Adding OAuth would mean a GitHub OAuth App plus the sveltia-cms-auth Cloudflare
+# Worker -- a hosted service and a long-lived secret this project avoids on purpose.
+#
+# Nothing secret lives in this file.
+
+backend:
+  name: github
+  repo: CreativeDigitalGrowth/netlify-blog
+  branch: main
+
+# Commit straight to `branch` rather than opening editorial-workflow PRs.
+publish_mode: simple
+
+# Allows `npx @sveltia/cms-proxy-server` to serve the working tree at
+# http://localhost:4321/admin/ so edits write to disk instead of GitHub.
+local_backend: true
+
+# Only the ORIGIN of site_url is used for preview links: Sveltia computes
+# `_baseURL = new URL(site_url).origin`. This is a root-served site, so the origin IS
+# the site root, and preview_path below is simply the route.
+site_url: https://creativedigitalgrowth.netlify.app/
+display_url: https://creativedigitalgrowth.netlify.app/
+
+# Fallback media location so the media library has somewhere to browse. The blog
+# collection below overrides both values; nothing in this site relies on these.
+media_folder: src/assets/images/uploads
+public_folder: /src/assets/images/uploads
+
+collections:
+  - name: blog
+    label: Blog
+    label_singular: Post
+    description: "Posts published at /blog/<slug>/"
+    folder: src/content/blog
+    create: true
+    delete: true
+    extension: md
+    format: frontmatter
+    # Filename becomes the URL slug, derived from the title: lowercase, hyphenated.
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title, category]
+    # Path from the SITE ORIGIN. This is a root-served site, so the route is all that
+    # is needed:
+    #   https://creativedigitalgrowth.netlify.app + / + blog/<slug>/
+    # The trailing slash matches astro.config.mjs `trailingSlash: 'always'`.
+    preview_path: blog/{{slug}}/
+    preview_path_date_field: date
+
+    # Uploads land in src/assets/images/uploads/ (relative to this collection's
+    # `folder`), and the SAME relative string is written into the frontmatter.
+    # From src/content/blog/post.md that resolves to src/assets/images/uploads/…,
+    # which is exactly what Astro's image() schema helper needs to optimise it.
+    media_folder: ../../assets/images/uploads
+    public_folder: ../../assets/images/uploads
+
+    fields:
+      - name: title
+        label: Title
+        widget: string
+
+      - name: description
+        label: Description
+        widget: text
+        hint: "One or two sentences. Used for the card excerpt, meta description and social cards."
+
+      - name: date
+        label: Date
+        widget: datetime
+        format: "YYYY-MM-DDTHH:mm:ss.SSSZ"
+        picker_utc: true
+
+      - name: author
+        label: Author
+        widget: string
+        default: Your Name
+
+      - name: featured_image
+        label: Featured image
+        widget: image
+        # URLs are allowed as well as uploads: a remote image is downloaded at
+        # build time, resized and re-served from this site, so either route ends
+        # up optimised and costs the reader no third-party request.
+        choose_url: true
+        hint: "Upload a file or paste an image URL. Landscape works best - cropped to 16:9 on cards, full width on the post."
+
+      - name: category
+        label: Category
+        widget: string
+        hint: "One category per post. Existing ones: Notes, Workflow, Engineering."
+
+      - name: tags
+        label: Tags
+        widget: list
+        required: false
+        default: []
+        hint: "Two or three is plenty. Reuse existing tags so the archives stay useful."
+
+      - name: draft
+        label: Draft
+        widget: boolean
+        default: true
+        hint: "New posts start as drafts. Turn this off to publish - drafts never reach the live site."
+
+      - name: map_embed
+        label: Location map
+        widget: text
+        required: false
+        hint: "Optional. Google Maps > Share > Embed a map > copy HTML, and paste the whole <iframe ...> here. Only the map address is used - size is set by the site, so the map always fills the width."
+
+      - name: body
+        label: Body
+        widget: markdown

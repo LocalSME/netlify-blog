@@ -1,0 +1,131 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION, DEFAULT_OG_IMAGE, AUTHOR_NAME } from '../consts';
+import { getImage } from 'astro:assets';
+import { absFromBuiltPath, absUrl, isAbsoluteUrl, withBase } from '../lib/url';
+
+interface Props {
+  /** Page-specific title. Omit on the home page to use the site title alone. */
+  title?: string;
+  description?: string;
+  /** Either an imported image (post hero) or a path inside /public. */
+  image?: ImageMetadata | string;
+  type?: 'website' | 'article';
+  /** Article-only metadata, also used to emit JSON-LD BlogPosting. */
+  article?: {
+    publishedDate: Date;
+    author: string;
+    category: string;
+    tags: string[];
+  };
+  noindex?: boolean;
+}
+
+const { title, description = SITE_DESCRIPTION, image, type = 'website', article, noindex = false } =
+  Astro.props;
+
+const pageTitle = title ? `${title} — ${SITE_TITLE}` : SITE_TITLE;
+
+// Astro.url.pathname is a built path: the base is already on it.
+const canonical = absFromBuiltPath(Astro.url.pathname, Astro.site);
+
+/**
+ * Social-card image. Three shapes arrive here and each needs different handling:
+ *   - a remote URL   -> fetched and re-emitted locally, so previews do not depend
+ *                       on a third-party host staying up
+ *   - a /public path -> needs the base prefix
+ *   - ImageMetadata  -> .src already carries the base
+ */
+let ogImage: string;
+if (typeof image === 'string' && isAbsoluteUrl(image)) {
+  try {
+    const resolved = await getImage({ src: image, inferSize: true, width: 1200, format: 'webp' });
+    ogImage = absFromBuiltPath(resolved.src, Astro.site);
+  } catch {
+    // Host unreachable at build time — point social scrapers at the original URL
+    // rather than failing the build over a preview image.
+    ogImage = image;
+  }
+} else if (typeof image === 'string') {
+  ogImage = absUrl(image, Astro.site);
+} else if (image) {
+  ogImage = absFromBuiltPath(image.src, Astro.site);
+} else {
+  ogImage = absUrl(DEFAULT_OG_IMAGE, Astro.site);
+}
+
+const jsonLd = article
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: title,
+      description,
+      image: [ogImage],
+      datePublished: article.publishedDate.toISOString(),
+      author: { '@type': 'Person', name: article.author },
+      publisher: { '@type': 'Person', name: AUTHOR_NAME },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+      articleSection: article.category,
+      keywords: article.tags.join(', '),
+      url: canonical,
+    }
+  : null;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE_TITLE}
+  href={withBase('/rss.xml')}
+/>
+<link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={SITE_TITLE} />
+<meta property="og:title" content={title ?? SITE_TITLE} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title ?? SITE_TITLE} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{
+  article && (
+    <>
+      <meta property="article:published_time" content={article.publishedDate.toISOString()} />
+      <meta property="article:author" content={article.author} />
+      <meta property="article:section" content={article.category} />
+      {article.tags.map((tag) => <meta property="article:tag" content={tag} />)}
+    </>
+  )
+}
+
+{jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+<!--
+  Theme bootstrap. Inlined and placed before any painted markup so a stored
+  preference is applied before first paint. With no stored value the element
+  stays bare and the CSS prefers-color-scheme rules take over.
+-->
+<script is:inline>
+  try {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') {
+      document.documentElement.dataset.theme = stored;
+    }
+  } catch {
+    /* localStorage unavailable (private mode / blocked cookies) — use OS preference */
+  }
+</script>

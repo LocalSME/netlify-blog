@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import FeaturedImage from '../components/FeaturedImage.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { getPosts, getCategories, postPath, readingTime } from '../lib/posts';
+import { slugify, withBase } from '../lib/url';
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR_NAME, AUTHOR_BIO, FEATURES } from '../consts';
+
+const posts = await getPosts();
+const [featured, ...rest] = posts;
+const latest = rest.slice(0, 6);
+const categories = getCategories(posts);
+---
+
+<BaseLayout description={SITE_DESCRIPTION}>
+  <section class="hero">
+    <p class="eyebrow">{SITE_TITLE}</p>
+    <h1>Writing about the work, one post at a time.</h1>
+    <p>{SITE_DESCRIPTION}</p>
+    <div class="hero-actions">
+      <a class="button" href={withBase('/blog/')}>Read the blog</a>
+      {
+        FEATURES.about && (
+          <a class="button button-ghost" href={withBase('/about/')}>
+            About the author
+          </a>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    featured && (
+      <section class="section" aria-labelledby="featured-heading">
+        <div class="section-head">
+          <h2 id="featured-heading">Featured</h2>
+          <a class="read-more" href={withBase('/blog/')}>
+            All posts
+          </a>
+        </div>
+
+        <article class="featured">
+          <a class="featured-media" href={withBase(postPath(featured))} tabindex="-1" aria-hidden="true">
+            <FeaturedImage
+              src={featured.data.featured_image}
+              alt=""
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 48rem) 40rem, 92vw"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </a>
+
+          <div class="featured-body">
+            <p class="meta">
+              <a class="pill pill-accent" href={withBase(`/category/${slugify(featured.data.category)}/`)}>
+                {featured.data.category}
+              </a>
+              <FormattedDate date={featured.data.date} />
+              <span>{readingTime(featured.body)} min read</span>
+            </p>
+            <h3>
+              <a href={withBase(postPath(featured))}>{featured.data.title}</a>
+            </h3>
+            <p>{featured.data.description}</p>
+            <p>
+              <a class="read-more" href={withBase(postPath(featured))}>
+                Read the post<span class="visually-hidden"> {featured.data.title}</span>
+              </a>
+            </p>
+          </div>
+        </article>
+      </section>
+    )
+  }
+
+  {
+    latest.length > 0 && (
+      <section class="section" aria-labelledby="latest-heading">
+        <div class="section-head">
+          <h2 id="latest-heading">Latest posts</h2>
+        </div>
+        <ul class="post-grid">
+          {latest.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    categories.length > 0 && (
+      <section class="section" aria-labelledby="categories-heading">
+        <div class="section-head">
+          <h2 id="categories-heading">Browse by category</h2>
+        </div>
+        <ul class="tag-list">
+          {categories.map((category) => (
+            <li>
+              <a class="pill" href={withBase(`/category/${category.slug}/`)}>
+                {category.name} ({category.count})
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="author-heading">
+    <div class="section-head">
+      <h2 id="author-heading">About {AUTHOR_NAME}</h2>
+    </div>
+    <p class="lead" style="max-width: 60ch;">{AUTHOR_BIO}</p>
+    {
+      FEATURES.about && (
+        <p style="margin-top: 1rem;">
+          <a class="read-more" href={withBase('/about/')}>More about this blog</a>
+        </p>
+      )
+    }
+  </section>
+</BaseLayout>

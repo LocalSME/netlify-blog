@@ -1,0 +1,17 @@
+# Netlify build configuration, committed to the repo rather than left in the
+# dashboard only — unlike the sibling Cloudflare Pages blog, Netlify's own convention
+# is to track build settings here so they travel with the code and show up in `git
+# diff` and PRs. Netlify's dashboard Git integration reads this file automatically;
+# nothing else needs to be set up in the UI besides connecting the repo (see
+# docs/setup.md).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Pretty 404s: Netlify's own default already serves public/404.html-style pages, but
+# Astro emits /404.astro as dist/404.html, which Netlify picks up automatically for
+# unmatched paths. No redirects/rewrites are needed beyond that.

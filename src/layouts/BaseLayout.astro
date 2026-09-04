@@ -1,0 +1,39 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: ImageMetadata | string;
+  type?: 'website' | 'article';
+  article?: {
+    publishedDate: Date;
+    author: string;
+    category: string;
+    tags: string[];
+  };
+  noindex?: boolean;
+  /** Constrain <main> to reading width instead of the full grid width. */
+  narrow?: boolean;
+}
+
+const { narrow = false, ...head } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead {...head} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" class={narrow ? 'prose-wrap' : 'wrap'}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

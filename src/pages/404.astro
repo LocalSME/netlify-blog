@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+import { FEATURES } from '../consts';
+---
+
+<BaseLayout title="Page not found" description="That page does not exist." narrow noindex>
+  <div class="center stack" style="padding-block: 3rem;">
+    <p class="eyebrow">Error 404</p>
+    <h1>That page has moved on</h1>
+    <p class="lead">
+      The link may be out of date, or the post may have been renamed since it was shared.
+    </p>
+    <div class="hero-actions" style="justify-content: center;">
+      <a class="button" href={withBase('/blog/')}>Browse all posts</a>
+      {
+        FEATURES.search && (
+          <a class="button button-ghost" href={withBase('/search/')}>
+            Search the archive
+          </a>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

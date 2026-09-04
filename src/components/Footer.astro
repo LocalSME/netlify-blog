@@ -1,0 +1,36 @@
+---
+import { SITE_TITLE, SOCIAL_LINKS, FEATURES } from '../consts';
+import { withBase } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>&copy; {year} {SITE_TITLE}. Built with Astro, hosted on GitHub Pages.</p>
+
+    <ul class="footer-links">
+      <li><a href={withBase('/blog/')}>Blog</a></li>
+      {FEATURES.about && (
+        <li>
+          <a href={withBase('/about/')}>About</a>
+        </li>
+      )}
+      {FEATURES.contact && (
+        <li>
+          <a href={withBase('/contact/')}>Contact</a>
+        </li>
+      )}
+      <li><a href={withBase('/rss.xml')}>RSS</a></li>
+      {
+        SOCIAL_LINKS.map((link) => (
+          <li>
+            <a href={link.href} rel="me noopener">
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</footer>

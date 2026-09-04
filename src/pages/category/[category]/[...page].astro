@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { getPosts, getCategories, type Post } from '../../../lib/posts';
+import { slugify, withBase } from '../../../lib/url';
+import { POSTS_PER_PAGE } from '../../../consts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPosts();
+  return getCategories(posts).flatMap((category) =>
+    paginate(
+      posts.filter((post) => slugify(post.data.category) === category.slug),
+      {
+        params: { category: category.slug },
+        props: { categoryName: category.name },
+        pageSize: POSTS_PER_PAGE,
+      },
+    ),
+  );
+}) satisfies GetStaticPaths;
+
+const { page, categoryName } = Astro.props as { page: Page<Post>; categoryName: string };
+---
+
+<BaseLayout
+  title={page.currentPage === 1 ? `${categoryName}` : `${categoryName} — page ${page.currentPage}`}
+  description={`Posts filed under ${categoryName}.`}
+  noindex={page.currentPage > 1}
+>
+  <header class="section-head" style="margin-block-end: 2rem;">
+    <div>
+      <p class="eyebrow">Category</p>
+      <h1>{categoryName}</h1>
+    </div>
+    <p class="meta">{page.total} {page.total === 1 ? 'post' : 'posts'}</p>
+  </header>
+
+  <ul class="post-grid">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </ul>
+
+  <Pagination
+    prevUrl={page.url.prev}
+    nextUrl={page.url.next}
+    current={page.currentPage}
+    total={page.lastPage}
+  />
+
+  <p style="margin-block-start: 2rem;">
+    <a class="read-more" href={withBase('/blog/')}>All posts</a>
+  </p>
+</BaseLayout>

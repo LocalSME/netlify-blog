@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Content Manager</title>
+
+    <!--
+      Config lives beside this file. The href is relative on purpose: the site is
+      served from a sub-path (/blog/), so an absolute /admin/config.yml would 404.
+    -->
+    <link href="config.yml" type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <!--
+      Sveltia CMS, loaded from its official CDN exactly as the docs specify:
+      no `type="module"`, and no stylesheet — all styles are bundled in the JS.
+
+      This URL tracks the latest release, so bug fixes arrive without a redeploy.
+      To pin instead (verified current release at time of setup: 0.201.1), swap in:
+        <script src="https://unpkg.com/@sveltia/cms@0.201.1/dist/sveltia-cms.js"></script>
+    -->
+    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+
+    <script>
+      /*
+       * Hide the "Sign In with GitHub" button.
+       *
+       * Sveltia renders it unconditionally and offers no config option to turn it
+       * off, but it starts an OAuth flow that needs a server to hold a client
+       * secret. This site has no `base_url` and no OAuth backend, so Sveltia falls
+       * back to Netlify's provider — which this site is not registered with — and
+       * the button hangs on "Signing in…" forever instead of failing visibly.
+       * "Sign In Using Access Token" is the working route. See docs/troubleshooting.md.
+       *
+       * This patches third-party markup, so it is written to FAIL OPEN: unless the
+       * login screen looks exactly as expected — one OAuth button, one token button
+       * — it does nothing and both buttons stay visible. The worst case is the
+       * button reappearing after a Sveltia update, never the wrong one vanishing.
+       *
+       * Delete this block if an OAuth backend is ever configured.
+       */
+      (() => {
+        const TOKEN = /token/i;
+        const OAUTH = /sign in with/i;
+        // Sveltia wraps interpolated names in Unicode bidi isolates (U+2066–U+2069).
+        const label = (el) => el.textContent.replace(/[⁦-⁩]/g, '').trim();
+
+        const hideOAuthButton = () => {
+          const buttons = [...document.querySelectorAll('button')];
+          if (buttons.length < 2) return;
+
+          const tokenButtons = buttons.filter((b) => TOKEN.test(label(b)));
+          const oauthButtons = buttons.filter(
+            (b) => OAUTH.test(label(b)) && !TOKEN.test(label(b)),
+          );
+
+          // Bail unless the screen is unambiguous: exactly one of each. This also
+          // means we never touch anything once the user is past the login screen.
+          if (tokenButtons.length !== 1 || oauthButtons.length !== 1) return;
+
+          const oauth = oauthButtons[0];
+          if (oauth.hidden) return;
+          oauth.hidden = true;
+          oauth.style.display = 'none';
+        };
+
+        // The CMS mounts asynchronously and re-renders this screen on sign-out,
+        // so watch rather than running once. The callback exits early on every
+        // mutation that is not the login screen, so it stays cheap.
+        hideOAuthButton();
+        new MutationObserver(hideOAuthButton).observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+      })();
+    </script>
+  </body>
+</html>

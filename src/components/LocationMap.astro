@@ -1,0 +1,27 @@
+---
+import { extractMapSrc } from '../lib/maps';
+
+interface Props {
+  /** Raw value of the post's `map_embed` field — an iframe snippet or a URL. */
+  embed?: string;
+}
+
+const src = extractMapSrc(Astro.props.embed);
+---
+
+{
+  src && (
+    <section class="location" aria-labelledby="location-heading">
+      <h2 id="location-heading">Location</h2>
+      <div class="location-map">
+        <iframe
+          src={src}
+          title="Map showing the location"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        />
+      </div>
+    </section>
+  )
+}

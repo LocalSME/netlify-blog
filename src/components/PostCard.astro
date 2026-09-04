@@ -1,0 +1,61 @@
+---
+import type { Post } from '../lib/posts';
+import { postPath } from '../lib/posts';
+import { slugify, withBase } from '../lib/url';
+import FormattedDate from './FormattedDate.astro';
+import FeaturedImage from './FeaturedImage.astro';
+
+interface Props {
+  post: Post;
+  /** Cards above the fold on the home page should not lazy-load. */
+  eager?: boolean;
+}
+
+const { post, eager = false } = Astro.props;
+const { title, description, date, category, tags, featured_image } = post.data;
+const href = withBase(postPath(post));
+---
+
+<li>
+  <article class="card">
+    <a class="card-media" href={href} tabindex="-1" aria-hidden="true">
+      <FeaturedImage
+        src={featured_image}
+        alt=""
+        widths={[320, 640, 960]}
+        sizes="(min-width: 64rem) 20rem, (min-width: 40rem) 45vw, 92vw"
+        loading={eager ? 'eager' : 'lazy'}
+      />
+    </a>
+
+    <div class="card-body">
+      <p class="meta">
+        <a class="pill pill-accent" href={withBase(`/category/${slugify(category)}/`)}>{category}</a>
+        <FormattedDate date={date} />
+      </p>
+
+      <h3><a href={href}>{title}</a></h3>
+      <p class="card-excerpt">{description}</p>
+
+      {
+        tags.length > 0 && (
+          <ul class="tag-list">
+            {tags.map((tag) => (
+              <li>
+                <a class="pill" href={withBase(`/tag/${slugify(tag)}/`)}>
+                  #{tag}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      <p class="card-footer">
+        <a class="read-more" href={href}>
+          Read more<span class="visually-hidden"> about {title}</span>
+        </a>
+      </p>
+    </div>
+  </article>
+</li>

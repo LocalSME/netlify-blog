@@ -1,0 +1,42 @@
+---
+import { SITE_TITLE, FEATURES } from '../consts';
+import { withBase } from '../lib/url';
+import ThemeToggle from './ThemeToggle.astro';
+
+// Entries whose feature flag is off are dropped — the pages they point at are not
+// generated, so linking to them would 404.
+const nav = [
+  { label: 'Blog', href: '/blog/', enabled: true },
+  { label: 'About', href: '/about/', enabled: FEATURES.about },
+  { label: 'Search', href: '/search/', enabled: FEATURES.search },
+  { label: 'Contact', href: '/contact/', enabled: FEATURES.contact },
+].filter((item) => item.enabled);
+
+// Trailing-slash-insensitive comparison so /blog/2/ still highlights "Blog".
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => {
+  const target = withBase(href).replace(/\/+$/, '') || '/';
+  return here === target || here.startsWith(`${target}/`);
+};
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href={withBase('/')}>
+      <span class="mark" aria-hidden="true">{SITE_TITLE.charAt(0)}</span>
+      {SITE_TITLE}
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {
+        nav.map((item) => (
+          <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>

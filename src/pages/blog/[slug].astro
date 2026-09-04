@@ -1,0 +1,132 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import FeaturedImage from '../../components/FeaturedImage.astro';
+import LocationMap from '../../components/LocationMap.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import ShareLinks from '../../components/ShareLinks.astro';
+import Comments from '../../components/Comments.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, getAdjacent, getRelated, postPath, readingTime, type Post } from '../../lib/posts';
+import { absUrl, slugify, withBase } from '../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post, posts },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post, posts } = Astro.props as { post: Post; posts: Post[] };
+const { title, description, date, author, category, tags, featured_image, map_embed } = post.data;
+
+const { Content, headings } = await render(post);
+const { newer, older } = getAdjacent(posts, post);
+const related = getRelated(posts, post);
+const canonical = absUrl(postPath(post), Astro.site);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={featured_image}
+  type="article"
+  article={{ publishedDate: date, author, category, tags }}
+  narrow
+>
+  <article data-pagefind-body>
+    <header class="post-header">
+      <p class="meta">
+        <a class="pill pill-accent" href={withBase(`/category/${slugify(category)}/`)}>{category}</a>
+        <FormattedDate date={date} />
+        <span>{readingTime(post.body)} min read</span>
+      </p>
+
+      <h1>{title}</h1>
+      <p class="lead">{description}</p>
+      <p class="meta">By {author}</p>
+    </header>
+
+    <figure class="post-hero">
+      <FeaturedImage
+        src={featured_image}
+        alt={`Cover image for ${title}`}
+        widths={[480, 800, 1200, 1600]}
+        sizes="(min-width: 68rem) 68rem, 94vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </figure>
+
+    <TableOfContents headings={headings} />
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <LocationMap embed={map_embed} />
+
+    {
+      tags.length > 0 && (
+        <ul class="tag-list" style="margin-block-start: 2.5rem;">
+          {tags.map((tag) => (
+            <li>
+              <a class="pill" href={withBase(`/tag/${slugify(tag)}/`)}>
+                #{tag}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </article>
+
+  <div class="post-foot">
+    <ShareLinks url={canonical} title={title} />
+
+    {
+      (newer || older) && (
+        <nav aria-label="More posts">
+          <ul class="adjacent">
+            {newer && (
+              <li>
+                <a href={withBase(postPath(newer))} rel="prev">
+                  <span class="eyebrow">&larr; Newer</span>
+                  {newer.data.title}
+                </a>
+              </li>
+            )}
+            {older && (
+              <li class={newer ? '' : 'to-older'} style={newer ? '' : 'grid-column: 2;'}>
+                <a href={withBase(postPath(older))} rel="next" class="to-older">
+                  <span class="eyebrow">Older &rarr;</span>
+                  {older.data.title}
+                </a>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <section aria-labelledby="related-heading">
+          <h2 id="related-heading" style="margin-block-end: 1.25rem;">
+            Related posts
+          </h2>
+          <ul class="post-grid">
+            {related.map((item) => (
+              <PostCard post={item} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <Comments />
+  </div>
+</BaseLayout>

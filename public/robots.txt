@@ -1,0 +1,10 @@
+# Served at https://creativedigitalgrowth.netlify.app/robots.txt
+#
+# This is a root-served Netlify site, so the file sits at the domain root and
+# crawlers honour it directly.
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://creativedigitalgrowth.netlify.app/sitemap-index.xml

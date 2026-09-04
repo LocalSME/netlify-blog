@@ -1,0 +1,39 @@
+---
+import { GISCUS } from '../consts';
+
+// Giscus needs the numeric repo/category IDs from https://giscus.app. Until those
+// are filled in, render a short notice rather than a widget that cannot load.
+const configured = Boolean(GISCUS.repoId && GISCUS.categoryId);
+---
+
+<section class="comments" aria-labelledby="comments-heading">
+  <h2 id="comments-heading">Comments</h2>
+
+  {
+    configured ? (
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        data-repo={GISCUS.repo}
+        data-repo-id={GISCUS.repoId}
+        data-category={GISCUS.category}
+        data-category-id={GISCUS.categoryId}
+        data-mapping={GISCUS.mapping}
+        data-strict="1"
+        data-reactions-enabled={GISCUS.reactionsEnabled}
+        data-emit-metadata="0"
+        data-input-position={GISCUS.inputPosition}
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      />
+    ) : (
+      <p class="note">
+        Comments are not switched on yet. Add <code>repoId</code> and <code>categoryId</code> to{' '}
+        <code>GISCUS</code> in <code>src/consts.ts</code> using the values from giscus.app.
+      </p>
+    )
+  }
+</section>

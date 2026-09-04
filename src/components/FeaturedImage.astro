@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+import { resolveRemoteImage } from '../lib/remote-image';
+
+/**
+ * Renders a post's `featured_image`, which may be either:
+ *   - a local upload, already resolved to ImageMetadata by the content schema, or
+ *   - a remote URL string (a pasted stock-photo link).
+ *
+ * Remote images have to be fetched at build time to learn their dimensions, which
+ * makes the build depend on a third-party host being reachable. That dependency is
+ * NOT allowed to break the build: if the fetch fails, we fall back to pointing at
+ * the remote URL directly and log a warning. A post with a temporarily unreachable
+ * image host should cost you optimisation, not a failed deploy.
+ */
+interface Props {
+  src: ImageMetadata | string;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'low' | 'auto';
+}
+
+const { src, alt, widths, sizes, loading = 'lazy', fetchpriority } = Astro.props;
+
+const isRemote = typeof src === 'string';
+
+// Memoised, and returns undefined rather than throwing if the host is unreachable.
+const optimised = isRemote ? await resolveRemoteImage(src, { widths, sizes }) : undefined;
+---
+
+{
+  !isRemote ? (
+    <Image
+      src={src as ImageMetadata}
+      alt={alt}
+      widths={widths}
+      sizes={sizes}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding="async"
+    />
+  ) : optimised ? (
+    <img
+      src={optimised.src}
+      srcset={optimised.srcSet.attribute}
+      sizes={sizes}
+      width={optimised.attributes.width}
+      height={optimised.attributes.height}
+      alt={alt}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding="async"
+    />
+  ) : (
+    /* Degraded path: unreachable host at build time. The surrounding containers
+       carry a fixed aspect-ratio, so this still cannot shift the layout. */
+    <img
+      src={src as string}
+      alt={alt}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding="async"
+      referrerpolicy="no-referrer"
+    />
+  )
+}
