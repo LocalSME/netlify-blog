@@ -4,7 +4,7 @@ A static blog for a single author. Astro + TypeScript, Markdown content collecti
 Sveltia CMS at `/admin`, Pagefind search, Giscus comments, deployed to Netlify by its
 own dashboard Git integration.
 
-**Live:** <https://creativedigitalgrowth.netlify.app/>
+**Live:** <https://localsme.netlify.app/>
 
 Independent from the sibling GitHub Pages, Cloudflare Pages and GitLab Pages blogs —
 same engine, own content, own git history, own visual design. This one is a
@@ -53,7 +53,7 @@ Details in [troubleshooting.md](docs/troubleshooting.md).
 
 ## Writing a post
 
-Open [`/admin/`](https://creativedigitalgrowth.netlify.app/admin/) → **New Post** →
+Open [`/admin/`](https://localsme.netlify.app/admin/) → **New Post** →
 uncheck **Draft** → **Save**. That commits to `main`, which Netlify builds and deploys.
 
 Or write the file directly — posts are Markdown in `src/content/blog/`, and the filename
@@ -93,7 +93,7 @@ domain, as a config change rather than a rewrite.
 To verify after any change, build and confirm every absolute URL points at this site:
 
 ```bash
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'creativedigitalgrowth.netlify.app' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'localsme.netlify.app' | sort -u
 ```
 
 ## Status

@@ -1,7 +1,7 @@
 /**
  * Single place to edit the blog's identity. Nothing else hardcodes these values.
  */
-export const SITE_TITLE = 'Creative Digital Growth';
+export const SITE_TITLE = 'LocalSME';
 export const SITE_DESCRIPTION =
   'A small, fast, hand-built blog about the things worth writing down.';
 
@@ -41,9 +41,15 @@ export const TOC_MIN_HEADINGS = 3;
  * Fill these in from https://giscus.app after enabling Discussions and installing
  * the Giscus app on the repo. While `repoId` or `categoryId` are empty the comment
  * section renders a short notice instead of the widget.
+ *
+ * `repo` now points at the LocalSME mirror rather than the CreativeDigitalGrowth
+ * original this project was cloned from. `repoId`/`categoryId` are deliberately left
+ * blank rather than carried over — they identify the *old* repo's Discussions, and
+ * reusing them would silently misroute comments there. Regenerate both at
+ * https://giscus.app once GitHub Discussions is enabled on `LocalSME/netlify-blog`.
  */
 export const GISCUS = {
-  repo: 'CreativeDigitalGrowth/netlify-blog',
+  repo: 'LocalSME/netlify-blog',
   repoId: '',
   category: 'Announcements',
   categoryId: '',
@@ -61,5 +67,5 @@ export const CONTACT_FORM_ENDPOINT = '';
 
 /** Optional social links shown in the footer. Remove any you do not use. */
 export const SOCIAL_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/CreativeDigitalGrowth' },
+  { label: 'GitHub', href: 'https://github.com/LocalSME' },
 ] as const;

@@ -1,9 +1,9 @@
 # Deployment
 
-**Live URL:** <https://creativedigitalgrowth.netlify.app> — once the Netlify site is
+**Live URL:** <https://localsme.netlify.app> — once the Netlify site is
 created via the dashboard's Git integration connected to this repo (**not done yet** —
 see [setup.md](setup.md#1-netlify-git-integration)).
-**GitHub repo:** `CreativeDigitalGrowth/netlify-blog` — public, pushed, what the CMS
+**GitHub repo:** `LocalSME/netlify-blog` — public, pushed, what the CMS
 commits to and what Netlify's Git integration watches.
 **Netlify site:** connected directly to that repo from the Netlify dashboard (**Add new
 site → Import an existing project**) — see
@@ -71,7 +71,7 @@ A smoke test against the live site is the check that actually matters — it tes
 visitors get rather than what the local build produced. Run this once the site is live:
 
 ```bash
-B=https://creativedigitalgrowth.netlify.app
+B=https://localsme.netlify.app
 for p in "" "blog/" "about/" "contact/" "search/" "admin/" "rss.xml" "sitemap-index.xml" "pagefind/pagefind-ui.js"; do
   echo "$(curl -s -o /dev/null -w '%{http_code}' -L "$B/$p")  /$p"
 done
@@ -84,7 +84,7 @@ All should return `200`. Then confirm nothing leaked:
 curl -s -o /dev/null -w '%{http_code}\n' -L "$B/blog/<draft-slug>/"   # expect 404
 
 # no root-absolute internal references
-curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'creativedigitalgrowth.netlify.app' | sort -u
+curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'localsme.netlify.app' | sort -u
 ```
 
 ## Rollback
@@ -121,14 +121,14 @@ draft exclusion. Use `preview` before assuming a deploy will behave.
 
 Two independent access paths, not one.
 
-**GitHub.** Pushing requires write access to `CreativeDigitalGrowth/netlify-blog`.
+**GitHub.** Pushing requires write access to `LocalSME/netlify-blog`.
 Changing repository settings — Discussions, collaborators, and which GitHub Apps are
-installed — requires **admin**, held by `CreativeDigitalGrowth`. The `mohiseen-aumni`
+installed — requires **admin**, held by `LocalSME`. The `LocalSME`
 account has Write only — same pattern as the sibling GitHub Pages and Cloudflare Pages
 repos.
 
 ```bash
-gh api repos/CreativeDigitalGrowth/netlify-blog --jq '.permissions'
+gh api repos/LocalSME/netlify-blog --jq '.permissions'
 ```
 
 **Netlify.** Separately, whoever has access to the Netlify team controls what's actually

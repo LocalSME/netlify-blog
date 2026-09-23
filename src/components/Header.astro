@@ -23,7 +23,9 @@ const isCurrent = (href: string) => {
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href={withBase('/')}>
-      <span class="mark" aria-hidden="true">{SITE_TITLE.charAt(0)}</span>
+      <span class="mark" aria-hidden="true">
+        <img src={withBase('/logo.png')} alt="" width="32" height="32" loading="eager" />
+      </span>
       {SITE_TITLE}
     </a>
 

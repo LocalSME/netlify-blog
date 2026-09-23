@@ -8,7 +8,10 @@ import sitemap from '@astrojs/sitemap';
 // sub-path (or onto a custom domain, see docs/setup.md) by changing `site`/`base`
 // here and nothing else.
 export default defineConfig({
-  site: 'https://creativedigitalgrowth.netlify.app',
+  // Placeholder domain, following this project family's brand-word.host-tld
+  // convention — no real Netlify site exists for this project yet. Correct this
+  // once/if one is created; see docs/setup.md.
+  site: 'https://localsme.netlify.app',
   trailingSlash: 'always',
   integrations: [
     sitemap({

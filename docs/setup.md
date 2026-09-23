@@ -3,13 +3,13 @@
 Everything on this page is done once. Sections degrade gracefully — missing pieces mean
 a notice or a fallback, not a broken build.
 
-Unlike the sibling Cloudflare blog, **none of the hosting side is done yet** for this
-project. The code is complete and builds clean locally, but nothing is live.
+Unlike the sibling Cloudflare blog, **the Netlify hosting side is not done yet** for
+this project. The code is complete and builds clean locally, but nothing is live.
 
 | Step | Status |
 | --- | --- |
-| GitHub repository created under `CreativeDigitalGrowth` | ❌ not created |
-| Code pushed to `main` | ❌ blocked on the repo existing |
+| GitHub repository created under `LocalSME` | ✅ done |
+| Code pushed to `main` | ✅ done |
 | Netlify Git integration connected | ❌ not done |
 | Fine-grained PAT for the CMS | ❌ not created |
 | Giscus comments | ❌ not configured |
@@ -18,28 +18,20 @@ project. The code is complete and builds clean locally, but nothing is live.
 
 ---
 
-## 0. Create and push the GitHub repository
+## 0. GitHub repository ✅
 
-This repo is meant to live at `CreativeDigitalGrowth/netlify-blog`, alongside the
-sibling GitHub Pages and Cloudflare Pages blogs. The local git credentials
-(`mohiseen-aumni`) are a **collaborator** on that account's existing repos, not an
-admin — collaborator access cannot create a *new* repository there. So this one step
-needs the `CreativeDigitalGrowth` account itself:
-
-1. Signed in as `CreativeDigitalGrowth`, create a new **public**, **empty** repository
-   named `netlify-blog` at <https://github.com/new> — do not initialise it with a
-   README, `.gitignore` or licence; this project already has all three.
-2. Add `mohiseen-aumni` as a collaborator: **Settings → Collaborators → Add people**.
-   The invitation has to be accepted from the `mohiseen-aumni` side before it can push.
-3. Once accepted, push this working tree:
+Done. `LocalSME/netlify-blog` already existed on GitHub as a plain mirror of the
+CreativeDigitalGrowth original, owned outright by the `LocalSME` account — unlike that
+original's collaborator-based setup, there is no admin/collaborator split to manage
+here. This working tree (a fresh clone of that mirror, rebranded into an independent
+project with its own working directory — see [CLAUDE.md](../CLAUDE.md)) has been
+committed and pushed to it directly:
 
 ```bash
-cd "C:\Claude\netlify-blog"
-git init -b main
+cd "C:\Claude\localsme-netlify-blog"
 git add -A
-git commit -m "Initial commit"
-git remote add origin https://github.com/CreativeDigitalGrowth/netlify-blog.git
-git push -u origin main
+git commit -m "Rebrand from CreativeDigitalGrowth to LocalSME"
+git push origin main
 ```
 
 ## 1. Netlify Git integration
@@ -50,16 +42,16 @@ that already exists on GitHub).
 
 1. Sign in at <https://app.netlify.com> with the account that should own this site.
 2. **Add new site → Import an existing project → Deploy with GitHub**, authorise
-   Netlify's GitHub App if prompted, and pick `CreativeDigitalGrowth/netlify-blog`.
+   Netlify's GitHub App if prompted, and pick `LocalSME/netlify-blog`.
 3. Netlify reads build settings from the committed [`netlify.toml`](../netlify.toml)
    automatically — build command `npm run build`, publish directory `dist`, Node 22.
    Nothing needs to be typed into the dashboard's build-settings form; leave it on
    "read from netlify.toml" if it asks.
 4. Deploy. Netlify assigns a random `<adjective-noun-nnnn>.netlify.app` subdomain by
    default. Change it to match the rest of this project: **Site configuration →
-   General → Site details → Change site name → `creativedigitalgrowth`**, which gives
+   General → Site details → Change site name → `localsme`**, which gives
    the live URL used throughout this repo's docs and code:
-   <https://creativedigitalgrowth.netlify.app>. If that name is already taken (Netlify
+   <https://localsme.netlify.app>. If that name is already taken (Netlify
    site names are global), pick another and update `site` in
    [`astro.config.mjs`](../astro.config.mjs), `site_url`/`display_url` in
    [`public/admin/config.yml`](../public/admin/config.yml) and
@@ -83,7 +75,7 @@ Two kinds of token work, and which one you can use depends on **who owns the rep
 
 | Field | Value |
 | --- | --- |
-| Resource owner | `CreativeDigitalGrowth` |
+| Resource owner | `LocalSME` |
 | Repository access | **Only select repositories → `netlify-blog`** |
 | Repository permissions → **Contents** | **Read and write** |
 | Repository permissions → Metadata | Read-only (added automatically) |
@@ -116,7 +108,7 @@ strictly tighter. Prefer fine-grained when the owner account is available to you
 
 Whichever you use, commits are authored by the account that issued the token.
 
-Then open <https://creativedigitalgrowth.netlify.app/admin/>, choose
+Then open <https://localsme.netlify.app/admin/>, choose
 **"Sign In Using Access Token"** and paste it.
 
 > There is no "Sign In with GitHub" button on the login screen. It starts an OAuth flow
@@ -138,14 +130,14 @@ configured, post pages show a one-line notice instead of the widget — nothing 
 2. Open the **Discussions** tab and make sure a category exists. The default expected by
    `src/consts.ts` is **Announcements**; any category works as long as the names match.
 3. Install the app at <https://github.com/apps/giscus> and grant it access to
-   `CreativeDigitalGrowth/netlify-blog` **only**.
-4. Go to <https://giscus.app>, enter `CreativeDigitalGrowth/netlify-blog`, pick the
+   `LocalSME/netlify-blog` **only**.
+4. Go to <https://giscus.app>, enter `LocalSME/netlify-blog`, pick the
    category, and choose *Discussion title contains page pathname* for the mapping.
 5. Copy the generated `data-repo-id` and `data-category-id` into `src/consts.ts`:
 
 ```ts
 export const GISCUS = {
-  repo: 'CreativeDigitalGrowth/netlify-blog',
+  repo: 'LocalSME/netlify-blog',
   repoId: 'R_kg...',        // ← paste
   category: 'Announcements',
   categoryId: 'DIC_kw...',  // ← paste

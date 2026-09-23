@@ -59,7 +59,7 @@ see pushes to `main` and pull the code to build.
 That gives two independent things to think about, separate from the CMS token above:
 
 - **The GitHub App installation itself.** Anyone who can manage installed GitHub Apps on
-  the `CreativeDigitalGrowth` account can revoke or reconfigure what repositories
+  the `LocalSME` account can revoke or reconfigure what repositories
   Netlify's integration can see. That is a GitHub-side permission, not a Netlify one.
 - **Netlify team/site access.** Separately, anyone who can log into the Netlify team can
   change build settings, environment variables, custom domains, or roll back to an
@@ -124,7 +124,7 @@ pinned alternative if you would rather trade one risk for the other.
 ## Reporting a vulnerability
 
 If you find a security problem, please **do not open a public issue**. Email the address
-on the [contact page](https://creativedigitalgrowth.netlify.app/contact/)
+on the [contact page](https://localsme.netlify.app/contact/)
 with enough detail to reproduce it, and allow a reasonable window before disclosure.
 
 This is a personal blog maintained by one person, not a funded project — there is no

@@ -5,7 +5,7 @@ identical results — the CMS is just an editor for the same files.
 
 ## The CMS
 
-Open <https://creativedigitalgrowth.netlify.app/admin/> and choose **"Sign
+Open <https://localsme.netlify.app/admin/> and choose **"Sign
 In Using Access Token"** (see [setup.md](setup.md#2-access-token-for-the-cms)).
 
 **New Post → fill the fields → uncheck Draft → Save.**
@@ -155,7 +155,7 @@ Two consequences worth knowing:
 Uploading is still the more robust option. A URL is a convenience, not the default.
 
 **Do not put images in `public/`.** Anything there is copied verbatim and never
-optimised. The only images that belong in `public/` are `favicon.svg` and
+optimised. The only images that belong in `public/` are `favicon.png`, `logo.png` and
 `social-card.png`, which must exist at fixed URLs.
 
 Always write real alt text. Decorative images take `alt=""`.

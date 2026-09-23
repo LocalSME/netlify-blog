@@ -2,9 +2,9 @@
 
 A solo-author static blog: Astro 7 + TypeScript, deployed to **Netlify** by its
 dashboard's own Git integration, served from the domain root. Independent from the
-sibling GitHub Pages blog (`CreativeDigitalGrowth/CreativeDigitalGrowth.github.io`),
-the sibling Cloudflare Pages blog (`CreativeDigitalGrowth/cloudflare-blog`) and the
-sibling GitLab Pages blog (`creativedigitalgrowth.gitlab.io`) — not a mirror, no shared
+sibling GitHub Pages blog (`LocalSME/LocalSME.github.io`),
+the sibling Cloudflare Pages blog (`LocalSME/cloudflare-blog`) and the
+sibling GitLab Pages blog (`localsme.gitlab.io`) — not a mirror, no shared
 content, no shared git history. The visual design is also deliberately different from
 all three siblings — see the note at the top of `src/styles/global.css`. Full detail in
 [`docs/architecture.md`](docs/architecture.md).
@@ -82,7 +82,7 @@ setting needs to change, change it here, not by hunting for a dashboard override
 ```bash
 npm run check    # expect 0 errors
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'creativedigitalgrowth.netlify.app' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'localsme.netlify.app' | sort -u
 ```
 
 The grep must print only genuinely external URLs (giscus, google maps, unpkg). If the
@@ -92,7 +92,7 @@ change is visible in a browser, verify with `npm run preview` rather than `npm r
 ## Deployment
 
 Push to `main` → Netlify's dashboard Git integration (**Site configuration → Build &
-deploy**, connected to `CreativeDigitalGrowth/netlify-blog`) picks it up via its own
+deploy**, connected to `LocalSME/netlify-blog`) picks it up via its own
 GitHub App installation and builds and deploys it itself, using the settings in
 `netlify.toml` — `npm run build` (which triggers the `postbuild` Pagefind index), then
 publishing `dist/`. Saving in the CMS is a push, so publishing and deploying are the
@@ -102,9 +102,9 @@ this pipeline. See [`docs/deployment.md`](docs/deployment.md).
 No repository secrets exist or are needed — build authorization is entirely between
 Netlify and its own GitHub App installation, not a token stored in this repo.
 
-Local git authenticates as `mohiseen-aumni`, the same account used for the sibling
+Local git authenticates as `LocalSME`, the same account used for the sibling
 GitHub Pages and Cloudflare Pages blogs. The repository exists on GitHub, is public, and
-is live at `CreativeDigitalGrowth/netlify-blog`.
+is live at `LocalSME/netlify-blog`.
 
 ## Documentation
 

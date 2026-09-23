@@ -37,7 +37,8 @@ src/
 └── styles/global.css        Design tokens + all styling
 public/
 ├── admin/                   Sveltia CMS (index.html + config.yml)
-├── favicon.svg              Theme-aware
+├── favicon.png              Small browser-tab icon, tight crop of logo.png
+├── logo.png                 Header brand mark and apple-touch-icon, full badge
 ├── robots.txt
 └── social-card.png          Default Open Graph image, 1200×630
 netlify.toml                 Build command, publish dir, Node version — see deployment.md
@@ -64,7 +65,7 @@ IDs, the contact endpoint and social links.
 dynamic routes ahead of rest parameters, and in a static build every path is enumerated
 up front, so the two cannot silently collide.
 
-Post URLs read `https://creativedigitalgrowth.netlify.app/blog/<slug>/` — the site root
+Post URLs read `https://localsme.netlify.app/blog/<slug>/` — the site root
 plus the collection's route. Netlify sites don't have GitHub's user-site-vs-project-site
 split at all, so there's no `/blog/blog/<slug>/`-style doubling risk to design around
 here — this project is root-served the same way the sibling GitHub Pages user site is,
@@ -130,7 +131,7 @@ To re-check after any change, build and confirm this prints nothing:
 
 ```bash
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'creativedigitalgrowth.netlify.app' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'localsme.netlify.app' | sort -u
 ```
 
 That's the full audit — every internal link, `srcset` entry and in-page anchor resolved
